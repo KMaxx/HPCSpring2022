@@ -52,14 +52,14 @@ omp_solved6: omp_solved6.c
 solved6: omp_solved6
 	./omp_solved6
 
-jacobi: ./jacobi2D-omp.cpp 
-	g++ -O3 -std=gnu++11 -o jacobi2D-omp -fopenmp jacobi2D-omp.cpp
+jacobi2D-omp: ./jacobi2D-omp.cpp 
+	g++ -std=gnu++11 -o jacobi2D-omp -fopenmp jacobi2D-omp.cpp
 
 run_jacobi: jacobi2D-omp
 	./jacobi2D-omp
 
-gs: ./gs2D-omp.cpp 
-	g++ -O3 -std=gnu++11 -o gs2D-omp -fopenmp gs2D-omp.cpp
+gs2D-omp: ./gs2D-omp.cpp 
+	g++ -std=gnu++11 -o gs2D-omp -fopenmp gs2D-omp.cpp
 
 run_gs: gs2D-omp
 	./gs2D-omp
