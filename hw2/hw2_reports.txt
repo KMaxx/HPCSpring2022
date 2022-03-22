@@ -1,0 +1,470 @@
+Path: https://github.com/KMaxx/HPCSpring2022.git 
+
+
+1. Finding Memory bugs. 
+g++ -o val_test01 -g val_test01.cpp
+valgrind ./val_test01
+
+Test 1:
+--- ORIGINAL ---
+
+TEST01
+  C++ version.
+  A sample code for analysis by VALGRIND.
+  0  1
+  1  1
+  2  2
+  3  3
+  4  5
+  5  8
+  6  13
+  7  21
+  8  34
+  9  55
+==2356== Invalid write of size 4
+==2356==    at 0x40097F: f(int) (val_test01.cpp:82)
+==2356==    by 0x400831: main (val_test01.cpp:40)
+==2356==  Address 0x5a25068 is 0 bytes after a block of size 40 alloc'd
+==2356==    at 0x4C29F73: malloc (vg_replace_malloc.c:309)
+==2356==    by 0x400882: f(int) (val_test01.cpp:72)
+==2356==    by 0x400831: main (val_test01.cpp:40)
+==2356==
+==2356== Invalid read of size 4
+==2356==    at 0x400995: f(int) (val_test01.cpp:83)
+==2356==    by 0x400831: main (val_test01.cpp:40)
+==2356==  Address 0x5a25068 is 0 bytes after a block of size 40 alloc'd
+==2356==    at 0x4C29F73: malloc (vg_replace_malloc.c:309)
+==2356==    by 0x400882: f(int) (val_test01.cpp:72)
+==2356==    by 0x400831: main (val_test01.cpp:40)
+==2356==
+  10  89
+==2356== Mismatched free() / delete / delete []
+==2356==    at 0x4C2BB8F: operator delete[](void*) (vg_replace_malloc.c:651)
+==2356==    by 0x4009F9: f(int) (val_test01.cpp:86)
+==2356==    by 0x400831: main (val_test01.cpp:40)
+==2356==  Address 0x5a25040 is 0 bytes inside a block of size 40 alloc'd
+==2356==    at 0x4C29F73: malloc (vg_replace_malloc.c:309)
+==2356==    by 0x400882: f(int) (val_test01.cpp:72)
+==2356==    by 0x400831: main (val_test01.cpp:40)
+==2356==
+
+TEST01
+  Normal end of execution.
+==2356==
+==2356== HEAP SUMMARY:
+==2356==     in use at exit: 0 bytes in 0 blocks
+==2356==   total heap usage: 1 allocs, 1 frees, 40 bytes allocated
+==2356==
+==2356== All heap blocks were freed -- no leaks are possible
+==2356==
+==2356== For lists of detected and suppressed errors, rerun with: -s
+==2356== ERROR SUMMARY: 3 errors from 3 contexts (suppressed: 0 from 0)
+
+--- FIXED ---
+
+TEST01
+  C++ version.
+  A sample code for analysis by VALGRIND.
+  0  1
+  1  1
+  2  2
+  3  3
+  4  5
+  5  8
+  6  13
+  7  21
+  8  34
+  9  55
+  10  89
+
+TEST01
+  Normal end of execution.
+==5626==
+==5626== HEAP SUMMARY:
+==5626==     in use at exit: 0 bytes in 0 blocks
+==5626==   total heap usage: 1 allocs, 1 frees, 80 bytes allocated
+==5626==
+==5626== All heap blocks were freed -- no leaks are possible
+==5626==
+==5626== For lists of detected and suppressed errors, rerun with: -s
+==5626== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+g++ -o val_test02 -g val_test02.cpp
+valgrind ./val_test02
+
+Test 2:
+--- ORIGINAL ---
+
+==29374== Memcheck, a memory error detector
+==29374== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==29374== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
+==29374== Command: ./val_test02
+==29374==
+
+TEST02:
+  C++ version
+  A sample code for analysis by VALGRIND.
+  0  0
+  1  2
+==29374== Conditional jump or move depends on uninitialised value(s)
+==29374==    at 0x4EC171E: std::ostreambuf_iterator<char, std::char_traits<char> > std::num_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::_M_insert_int<long>(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, long) const (in /usr/lib64/libstdc++.so.6.0.19)
+==29374==    by 0x4EC1CFC: std::num_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::do_put(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, long) const (in /usr/lib64/libstdc++.so.6.0.19)
+==29374==    by 0x4ECE06D: std::ostream& std::ostream::_M_insert<long>(long) (in /usr/lib64/libstdc++.so.6.0.19)
+==29374==    by 0x40094E: junk_data() (val_test02.cpp:104)
+==29374==    by 0x400821: main (val_test02.cpp:37)
+==29374==
+==29374== Use of uninitialised value of size 8
+==29374==    at 0x4EC1603: ??? (in /usr/lib64/libstdc++.so.6.0.19)
+==29374==    by 0x4EC1745: std::ostreambuf_iterator<char, std::char_traits<char> > std::num_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::_M_insert_int<long>(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, long) const (in /usr/lib64/libstdc++.so.6.0.19)
+==29374==    by 0x4EC1CFC: std::num_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::do_put(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, long) const (in /usr/lib64/libstdc++.so.6.0.19)
+==29374==    by 0x4ECE06D: std::ostream& std::ostream::_M_insert<long>(long) (in /usr/lib64/libstdc++.so.6.0.19)
+==29374==    by 0x40094E: junk_data() (val_test02.cpp:104)
+==29374==    by 0x400821: main (val_test02.cpp:37)
+==29374==
+==29374== Conditional jump or move depends on uninitialised value(s)
+==29374==    at 0x4EC160F: ??? (in /usr/lib64/libstdc++.so.6.0.19)
+==29374==    by 0x4EC1745: std::ostreambuf_iterator<char, std::char_traits<char> > std::num_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::_M_insert_int<long>(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, long) const (in /usr/lib64/libstdc++.so.6.0.19)
+==29374==    by 0x4EC1CFC: std::num_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::do_put(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, long) const (in /usr/lib64/libstdc++.so.6.0.19)
+==29374==    by 0x4ECE06D: std::ostream& std::ostream::_M_insert<long>(long) (in /usr/lib64/libstdc++.so.6.0.19)
+==29374==    by 0x40094E: junk_data() (val_test02.cpp:104)
+==29374==    by 0x400821: main (val_test02.cpp:37)
+==29374==
+==29374== Conditional jump or move depends on uninitialised value(s)
+==29374==    at 0x4EC1773: std::ostreambuf_iterator<char, std::char_traits<char> > std::num_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::_M_insert_int<long>(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, long) const (in /usr/lib64/libstdc++.so.6.0.19)
+==29374==    by 0x4EC1CFC: std::num_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::do_put(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, long) const (in /usr/lib64/libstdc++.so.6.0.19)
+==29374==    by 0x4ECE06D: std::ostream& std::ostream::_M_insert<long>(long) (in /usr/lib64/libstdc++.so.6.0.19)
+==29374==    by 0x40094E: junk_data() (val_test02.cpp:104)
+==29374==    by 0x400821: main (val_test02.cpp:37)
+==29374==
+  2  0
+  3  6
+  4  8
+  5  0
+  6  0
+  7  0
+  8  0
+  9  0
+
+TEST02
+  Normal end of execution.
+==29374==
+==29374== HEAP SUMMARY:
+==29374==     in use at exit: 0 bytes in 0 blocks
+==29374==   total heap usage: 1 allocs, 1 frees, 40 bytes allocated
+==29374==
+==29374== All heap blocks were freed -- no leaks are possible
+==29374==
+==29374== Use --track-origins=yes to see where uninitialised values come from
+==29374== For lists of detected and suppressed errors, rerun with: -s
+==29374== ERROR SUMMARY: 24 errors from 4 contexts (suppressed: 0 from 0)
+
+--- FIXED ---
+
+==812== Memcheck, a memory error detector
+==812== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==812== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
+==812== Command: ./val_test02
+==812==
+
+TEST02:
+  C++ version
+  A sample code for analysis by VALGRIND.
+  0  0
+  1  2
+  2  14
+  3  6
+  4  8
+  5  12
+  6  12
+  7  14
+  8  16
+  9  18
+
+TEST02
+  Normal end of execution.
+==812==
+==812== HEAP SUMMARY:
+==812==     in use at exit: 0 bytes in 0 blocks
+==812==   total heap usage: 1 allocs, 1 frees, 40 bytes allocated
+==812==
+==812== All heap blocks were freed -- no leaks are possible
+==812==
+==812== For lists of detected and suppressed errors, rerun with: -s
+==812== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+
+2. Optimizing matrix-matrix multiplication. 
+Used CIMS server: cuda1.cims.nyu.edu with Two Intel Xeon E5-2680 (2.50 GHz) (24 cores) and CentOS 7
+g++ -O3  -std=gnu++11 -fopenmp -march=native MMult1.cpp
+./a.out
+
+Loop orderings are written on the upper left corners of the results.
+jpi
+ Dimension       Time   
+        16   5.483838   
+        64   5.731542   
+       112   5.645256   
+       160   5.622179   
+       208   5.584779   
+       256   5.789004
+jip
+ Dimension       Time   
+        16   6.176016   
+        64   6.314131   
+       112   6.266650   
+       160   6.341544   
+       208   6.821638   
+       256   9.964201   
+ijp
+ Dimension       Time   
+        16   6.529101   
+        64   6.628044   
+       112   6.374545   
+       160   6.518264   
+       208   6.862054   
+       256  10.235305
+ipj
+ Dimension       Time    
+        16   5.456193   
+        64   5.753257   
+       112   5.556170   
+       160   6.764840   
+       208   7.099025   
+       256  11.183470
+pji
+ Dimension       Time   
+        16   6.131806   
+        64   5.614034  
+       112   5.578646  
+       160   5.592206 
+       208   5.509145   
+       256   5.555426  
+pij
+ Dimension       Time    
+        16   5.429260   
+        64   5.763165   
+       112   5.562019   
+       160   6.744976  
+       208   7.126687   
+       256  11.417142
+
+It can be noticed that jpi and pji perform slightly better than others. 
+These cases happen when i (iterator through rows) is in the innermost loop.
+It's better than the cases when p is in the innermost loop because loading elements of C after first two loops is less efficient than loading A and B.
+It's better than the cases when j is in the innermost loop because matrices are stored in column major order.   
+
+Block Matrix Mult:
+--- BLOCK_SIZE = 4 ---
+ Dimension       Time    Gflop/s       GB/s        Error
+      1780  38.432411   1.173957   0.073537 0.000000e+00
+      1828  41.446009   1.179060   0.073852 0.000000e+00
+      1876  43.561368   1.212515   0.075944 0.000000e+00
+      1924  46.466914   1.226200   0.076797 0.000000e+00
+      1972  51.105875   1.200438   0.075180 0.000000e+00
+
+--- BLOCK_SIZE = 8 ---
+ Dimension       Time    Gflop/s       GB/s        Error
+      1784  30.597811   1.484514   0.046599 0.000000e+00
+      1832  32.622641   1.507812   0.047325 0.000000e+00
+      1880  36.166886   1.469780   0.046126 0.000000e+00
+      1928  39.062060   1.467763   0.046058 0.000000e+00
+      1976  42.005774   1.469406   0.046105 0.000000e+00
+
+--- BLOCK_SIZE = 16 --- 
+ Dimension       Time    Gflop/s       GB/s        Error
+      1792  33.517426   1.373515   0.021653 0.000000e+00
+      1840  33.584521   1.483899   0.023388 0.000000e+00
+      1888  36.124793   1.490358   0.023484 0.000000e+00
+      1936  39.142318   1.483063   0.023364 0.000000e+00
+      1984  42.040849   1.486085   0.023407 0.000000e+00
+
+Optimal value for BLOCK_SIZE from above results is 16 because its results are slightly better. 
+
+OpenMP results for BLOCK_SIZE = 16:
+ Dimension       Time    Gflop/s       GB/s        Error
+        16   8.178673   0.978155   0.030567 0.000000e+00
+        64   1.809228   4.422126   0.086370 0.000000e+00
+       112   1.736055   4.609571   0.082314 0.000000e+00
+       160   0.580931  13.819478   0.237522 0.000000e+00
+       208   0.529614  15.224332   0.256179 0.000000e+00
+       256   1.640381   4.909264   0.081501 0.000000e+00
+       304   0.565380  14.311095   0.235380 0.000000e+00
+       352   0.493567  16.259226   0.265598 0.000000e+00
+       400   0.503874  16.258043   0.264193 0.000000e+00
+       448   0.538908  16.017362   0.259210 0.000000e+00
+       496   0.523932  16.768815   0.270465 0.000000e+00
+       544   0.561161  16.065608   0.258408 0.000000e+00
+       592   0.511424  16.227227   0.260403 0.000000e+00
+       640   0.534725  15.687694   0.251248 0.000000e+00
+       688   0.603058  17.280509   0.276287 0.000000e+00
+       736   0.543145  17.616882   0.281248 0.000000e+00
+       784   0.642290  18.006465   0.287093 0.000000e+00
+       832   0.522614  17.632305   0.280803 0.000000e+00
+       880   0.605869  17.996557   0.286309 0.000000e+00
+       928   0.709878  18.012768   0.286302 0.000000e+00
+       976   0.800500  18.582679   0.295114 0.000000e+00
+      1024   0.725480  11.840341   0.187896 0.000000e+00
+      1072   0.547932  17.986549   0.285234 0.000000e+00
+      1120   0.621429  18.086403   0.286637 0.000000e+00
+      1168   0.702251  18.152079   0.287512 0.000000e+00
+      1216   0.777753  18.494777   0.292783 0.000000e+00
+      1264   0.865113  18.674899   0.295489 0.000000e+00
+      1312   0.966280  18.697713   0.295715 0.000000e+00
+      1360   1.086004  18.529998   0.292937 0.000000e+00
+      1408   1.340137  16.662832   0.263315 0.000000e+00
+      1456   1.361377  18.138268   0.286525 0.000000e+00
+      1504   1.448376  18.791093   0.296734 0.000000e+00
+      1552   1.568094  19.071855   0.301070 0.000000e+00
+      1600   1.725583  18.989526   0.299678 0.000000e+00
+      1648   1.880901  19.036873   0.300339 0.000000e+00
+      1696   2.047059  19.065017   0.300701 0.000000e+00
+      1744   2.326111  18.243117   0.287664 0.000000e+00
+      1792   3.056646  15.061177   0.237432 0.000000e+00
+      1840   2.637328  18.896410   0.297824 0.000000e+00
+      1888   3.081885  17.469460   0.275274 0.000000e+00
+      1936   3.313572  17.519012   0.275997 0.000000e+00
+      1984   3.323264  18.799668   0.296114 0.000000e+00
+
+Peak FLOP-rate for Xeon E5-2680 is Max Turbo Frequency * DP = 3.5*8 = 28 Gflops/s. I have achieved 19 Gflops/s, which is about 68%. 
+
+Different optimization level flags:
+
+--- O2 ---
+g++ -O2  -std=gnu++11 -fopenmp -march=native MMult1.cpp
+ Dimension       Time    Gflop/s       GB/s        Error
+        16   2.556839   3.128868   0.097777 0.000000e+00
+        64   0.751025  10.652952   0.208065 0.000000e+00
+       112   0.476352  16.799474   0.299991 0.000000e+00
+       160   0.115683  69.398206   1.192782 0.000000e+00
+       208   0.104777  76.954082   1.294900 0.000000e+00
+       256   0.412239  19.534926   0.324310 0.000000e+00
+       304   0.127436  63.492347   1.044282 0.000000e+00
+       352   0.110592  72.563942   1.185348 0.000000e+00
+       400   0.107379  76.290341   1.239718 0.000000e+00
+       448   0.107777  80.089997   1.296099 0.000000e+00
+       496   0.111048  79.116537   1.276073 0.000000e+00
+       544   0.122970  73.313865   1.179221 0.000000e+00
+       592   0.108586  76.427456   1.226454 0.000000e+00
+       640   0.119036  70.471429   1.128644 0.000000e+00
+       688   0.128952  80.814423   1.292091 0.000000e+00
+       736   0.111808  85.580235   1.366261 0.000000e+00
+       784   0.123479  93.662298   1.493340 0.000000e+00
+       832   0.104363  88.296681   1.406167 0.000000e+00
+       880   0.117534  92.769481   1.475878 0.000000e+00
+       928   0.133929  95.475014   1.517518 0.000000e+00
+       976   0.147588 100.790550   1.600670 0.000000e+00
+      1024   0.397669  21.600739   0.342785 0.000000e+00
+      1072   0.109843  89.722223   1.422834 0.000000e+00
+      1120   0.122113  92.041362   1.458691 0.000000e+00
+      1168   0.132928  95.896608   1.518910 0.000000e+00
+      1216   0.150051  95.863109   1.517570 0.000000e+00
+      1264   0.168176  96.065317   1.520021 0.000000e+00
+      1312   0.168028 107.525015   1.700567 0.000000e+00
+      1360   0.180638 111.403489   1.761158 0.000000e+00
+      1408   0.215994 103.384618   1.633741 0.000000e+00
+      1456   0.213582 115.613862   1.826318 0.000000e+00
+      1504   0.230376 118.139615   1.865569 0.000000e+00
+      1552   0.243979 122.578064   1.935027 0.000000e+00
+      1600   0.315474 103.869226   1.639186 0.000000e+00
+      1648   0.317928 112.624603   1.776844 0.000000e+00
+      1696   0.388286 100.511548   1.585309 0.000000e+00
+      1744   0.323340 131.241123   2.069456 0.000000e+00
+      1792   0.645403  71.330093   1.124484 0.000000e+00
+      1840   0.373710 133.354852   2.101788 0.000000e+00
+      1888   0.398271 135.181379   2.130109 0.000000e+00
+      1936   0.424910 136.618375   2.152304 0.000000e+00
+      1984   0.507161 123.188205   1.940338 0.000000e+00
+
+--- O3 ---
+g++ -O3  -std=gnu++11 -fopenmp -march=native MMult1.cpp
+ Dimension       Time    Gflop/s       GB/s        Error
+        16   2.412447   3.316140   0.103629 0.000000e+00
+        64   0.765187  10.455787   0.204215 0.000000e+00
+       112   0.462344  17.308458   0.309080 0.000000e+00
+       160   0.103954  77.228122   1.327358 0.000000e+00
+       208   0.092548  87.122313   1.466000 0.000000e+00
+       256   0.487207  16.529039   0.274408 0.000000e+00
+       304   0.114214  70.842545   1.165173 0.000000e+00
+       352   0.098226  81.699368   1.334578 0.000000e+00
+       400   0.099524  82.311577   1.337563 0.000000e+00
+       448   0.106931  80.724054   1.306360 0.000000e+00
+       496   0.095984  91.532898   1.476337 0.000000e+00
+       544   0.105112  85.769289   1.379561 0.000000e+00
+       592   0.098049  84.641567   1.358268 0.000000e+00
+       640   0.125081  67.065602   1.074098 0.000000e+00
+       688   0.111549  93.422190   1.493669 0.000000e+00
+       736   0.094501 101.253231   1.616475 0.000000e+00
+       784   0.111048 104.147301   1.660512 0.000000e+00
+       832   0.095347  96.645953   1.539133 0.000000e+00
+       880   0.103348 105.503736   1.678469 0.000000e+00
+       928   0.119520 106.985371   1.700468 0.000000e+00
+       976   0.125603 118.432405   1.880842 0.000000e+00
+      1024   0.401128  21.414474   0.339829 0.000000e+00
+      1072   0.093997 104.848034   1.662702 0.000000e+00
+      1120   0.103628 108.459401   1.718888 0.000000e+00
+      1168   0.112288 113.523065   1.798096 0.000000e+00
+      1216   0.129650 110.947803   1.756369 0.000000e+00
+      1264   0.134933 119.732985   1.894509 0.000000e+00
+      1312   0.145521 124.155462   1.963587 0.000000e+00
+      1360   0.156605 128.499663   2.031428 0.000000e+00
+      1408   0.209863 106.404850   1.681469 0.000000e+00
+      1456   0.181248 136.238820   2.152124 0.000000e+00
+      1504   0.226947 119.924944   1.893762 0.000000e+00
+      1552   0.207816 143.908292   2.271748 0.000000e+00
+      1600   0.308053 106.371174   1.678670 0.000000e+00
+      1648   0.235835 151.828812   2.395357 0.000000e+00
+      1696   0.254626 153.272772   2.417480 0.000000e+00
+      1744   0.271782 156.138159   2.462041 0.000000e+00
+      1792   0.697867  65.967715   1.039949 0.000000e+00
+      1840   0.332393 149.930981   2.363043 0.000000e+00
+      1888   0.332158 162.088272   2.554092 0.000000e+00
+      1936   0.352997 164.450416   2.590774 0.000000e+00
+      1984   0.458395 136.293636   2.146762 0.000000e+00
+ 
+
+3. Finding OpenMP bugs.  
+gcc -o omp_bug2 -fopenmp omp_bug2.c
+./omp_bug2
+
+
+4. OpenMP version of 2D Jacobi/Gauss-Seidel smoothing.
+--- Jacobi ---
+[mk7756@cuda1 homework2]$ g++ -std=gnu++11 -o jacobi2D-omp -fopenmp jacobi2D-omp.cpp
+[mk7756@cuda1 homework2]$ ./jacobi2D-omp
+Run time for N = 100 and for 4 number of threads for 100 iterations: 0.011666
+[mk7756@cuda1 homework2]$ g++ -std=gnu++11 -o jacobi2D-omp -fopenmp jacobi2D-omp.cpp
+[mk7756@cuda1 homework2]$ ./jacobi2D-omp
+Run time for N = 100 and for 8 number of threads for 100 iterations: 0.016071
+[mk7756@cuda1 homework2]$ g++ -std=gnu++11 -o jacobi2D-omp -fopenmp jacobi2D-omp.cpp
+[mk7756@cuda1 homework2]$ ./jacobi2D-omp
+Run time for N = 100 and for 16 number of threads for 100 iterations: 0.009423
+[mk7756@cuda1 homework2]$ g++ -std=gnu++11 -o jacobi2D-omp -fopenmp jacobi2D-omp.cpp
+[mk7756@cuda1 homework2]$ ./jacobi2D-omp
+Run time for N = 1000 and for 4 number of threads for 100 iterations: 0.584814
+[mk7756@cuda1 homework2]$ g++ -std=gnu++11 -o jacobi2D-omp -fopenmp jacobi2D-omp.cpp
+[mk7756@cuda1 homework2]$ ./jacobi2D-omp
+Run time for N = 1000 and for 8 number of threads for 100 iterations: 0.281332
+[mk7756@cuda1 homework2]$ g++ -std=gnu++11 -o jacobi2D-omp -fopenmp jacobi2D-omp.cpp
+[mk7756@cuda1 homework2]$ ./jacobi2D-omp
+Run time for N = 1000 and for 16 number of threads for 100 iterations: 0.204181
+
+--- GS ---
+[mk7756@cuda1 homework2]$ g++ -std=gnu++11 -o gs2D-omp -fopenmp gs2D-omp.cpp
+[mk7756@cuda1 homework2]$ ./gs2D-omp
+Run time for N = 100 and for 4 number of threads for 100 iterations: 0.019108
+[mk7756@cuda1 homework2]$ g++ -std=gnu++11 -o gs2D-omp -fopenmp gs2D-omp.cpp
+[mk7756@cuda1 homework2]$ ./gs2D-omp
+Run time for N = 100 and for 8 number of threads for 100 iterations: 0.018924
+[mk7756@cuda1 homework2]$ g++ -std=gnu++11 -o gs2D-omp -fopenmp gs2D-omp.cpp
+[mk7756@cuda1 homework2]$ ./gs2D-omp
+Run time for N = 100 and for 16 number of threads for 100 iterations: 0.014589
+[mk7756@cuda1 homework2]$ g++ -std=gnu++11 -o gs2D-omp -fopenmp gs2D-omp.cpp
+[mk7756@cuda1 homework2]$ ./gs2D-omp
+Run time for N = 1000 and for 4 number of threads for 100 iterations: 0.717783
+[mk7756@cuda1 homework2]$ g++ -std=gnu++11 -o gs2D-omp -fopenmp gs2D-omp.cpp
+[mk7756@cuda1 homework2]$ ./gs2D-omp
+Run time for N = 1000 and for 8 number of threads for 100 iterations: 0.344185
+[mk7756@cuda1 homework2]$ g++ -std=gnu++11 -o gs2D-omp -fopenmp gs2D-omp.cpp
+[mk7756@cuda1 homework2]$ ./gs2D-omp
+Run time for N = 1000 and for 16 number of threads for 100 iterations: 0.213083
+
