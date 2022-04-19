@@ -1,4 +1,4 @@
-EXECUTABLES = MMult1 vec_inn mat_inn jacobi2D 
+EXECUTABLES = vec_inn mat_inn jacobi2D 
 COMPILER = nvcc
 FLAGS = -arch=sm_61 -Xcompiler -fopenmp
 
