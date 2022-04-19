@@ -1,0 +1,47 @@
+HW4 by Maksat Kuanyshbay
+Used CIMS servers: 
+cuda2.cims.nyu.edu with Two Intel Xeon E5-2660 (2.60 GHz) (40 cores), Two GeForce RTX 2080 Ti (11 GB memory each) 
+cuda3.cims.nyu.edu with Two Intel Xeon Gold 5118 (2.30 GHz) (48 cores), Two TITAN V (12 GB memory each) 
+
+Problem 1.
+--- Inner product between two given (long) vectors: ---
+[mk7756@cuda2 lecture9]$ nvcc -arch=sm_61 gpu06.cu -o gpu06 -Xcompiler -fopenmp
+[mk7756@cuda2 lecture9]$ ./gpu06
+
+-For cuda2.cims.nyu.edu:
+CPU Speed = 0.011795 s
+CPU Bandwidth = 45.242581 GB/s
+GPU Speed = 0.320628 s
+GPU Bandwidth = 1.674327 GB/s
+Error = 0.000521
+
+-For cuda3.cims.nyu.edu:
+CPU Speed = 0.025884 s
+CPU Bandwidth = 20.662468 GB/s
+GPU Speed = 0.372800 s
+GPU Bandwidth = 1.439941 GB/s
+Error = 0.000518
+
+--- Matrix-vector product: ---
+
+-For cuda2.cims.nyu.edu:
+CPU Speed = 0.038184 s
+CPU Bandwidth = 6.999747 GB/s
+GPU Speed = 0.049578 s
+GPU Bandwidth = 5.413368 GB/s
+Error = 0.000002
+
+-For cuda3.cims.nyu.edu:
+CPU Speed = 0.078236 s
+CPU Bandwidth = 3.427847 GB/s
+GPU Speed = 0.055943 s
+GPU Bandwidth = 4.797311 GB/s
+Error = 0.000002
+
+Problem 2.
+
+CPU Speed = 6.334333 s
+GPU Speed = 22.339839 s
+Error = 0.000000
+
+CPU is way faster because the code is optimized better, but GPU still does a pretty decent work.
